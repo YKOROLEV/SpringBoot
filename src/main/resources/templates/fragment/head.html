@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+
+<th:block th:fragment="bootstrap_header">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+    <script src="js/jquery/jquery-3.4.1.js"></script>
+    <script src="/js/popper/popper.js"></script>
+    <script src="bootstrap/js/bootstrap.js"></script>
+
+    <script sec:authorize="isAuthenticated()" th:inline="javascript">
+        const principal = /*[[${#authentication.getPrincipal().username}]]*/ null;
+    </script>
+</th:block>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Header</title>
+</head>
+
+<body>
+
+</body>
+</html>

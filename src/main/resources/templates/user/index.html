@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User page</title>
+
+    <div th:replace="fragment/head.html :: bootstrap_header"></div>
+</head>
+<body>
+
+<nav th:replace="fragment/navbar.html :: navbar">
+</nav>
+
+<div class="row min-vh-100">
+    <div th:replace="fragment/menu.html :: left_menu">
+    </div>
+
+    <div class="col-md-10" style="background-color: #f8f9fa1f">
+        <h2>User panel</h2>
+    </div>
+</div>
+
+</body>
+</html>
