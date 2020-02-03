@@ -83,6 +83,12 @@ public class ApiV1RestController {
         }
 
         try {
+            currentUser.setLogin(userDTO.getLogin());
+            currentUser.setName(userDTO.getName());
+            if (userDTO.getPassword() != null && userDTO.getPassword().length() > 0) {
+                currentUser.setPassword(userDTO.getPassword());
+            }
+
             userService.save(currentUser);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

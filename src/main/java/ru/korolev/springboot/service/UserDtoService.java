@@ -31,13 +31,7 @@ public class UserDtoService implements DtoService<User, UserDTO> {
             user = userRepository.findById(userDTO.getId())
                     .orElse(null);
         }
-
-        if (user != null) {
-            user.setLogin(userDTO.getLogin());
-            user.setName(userDTO.getName());
-            user.setPassword(userDTO.getPassword());
-        }
-
+        
         return user;
     }
 }

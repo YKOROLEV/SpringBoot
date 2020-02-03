@@ -22,4 +22,14 @@ export class RestUserService {
             }
         );
     }
+
+    update(user) {
+        return fetch('/api/v1/user/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user)
+        });
+    }
 }

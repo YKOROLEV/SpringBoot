@@ -2,7 +2,7 @@ import {RestUserService} from "./rest/rest-user.js";
 
 const userRestService = new RestUserService();
 
-let stateCreateNewUser = false;
+let stateUpdateOrNewUser = false;
 
 let userTable;
 let userData;
@@ -41,16 +41,26 @@ window.addEventListener('click', function (event) {
         dialogDeleteConfirm.modal('hide');
     } else if (event.target.id === 'button-user-create') {
         userCreate();
+    } else if (event.target.id === 'button-user-update') {
+        userUpdate();
     }
 });
 
 // при переходе на таб 'Users table' запросить новые данные и вывести их
 $('.nav-tabs').on('show.bs.tab', function (event) {
     if (event.target.text === 'Users table') {
-        if (stateCreateNewUser) {
+        if (stateUpdateOrNewUser) {
             userTableRefresh();
-            stateCreateNewUser = false;
+            stateUpdateOrNewUser = false;
         }
+    }
+});
+
+// при закрытии диалогового окна 'dialogUserUpdate'
+$('#dialogUserUpdate').on('hide.bs.modal', function () {
+    if (stateUpdateOrNewUser) {
+        userTableRefresh();
+        stateUpdateOrNewUser = false;
     }
 });
 
@@ -82,15 +92,21 @@ function userTableRefresh() {
 }
 
 function userActionEdit(user) {
+    let informationContainer = $('#informationUpdateUserContainer');
+    let information = $('#informationUpdateUser');
+
     let dialog = $('#dialogUserUpdate');
 
+    let inputId = $('#inputUpdateId');
     let inputLogin = $('#inputUpdateLogin');
     let inputName = $('#inputUpdateName');
     let inputPassword = $('#inputUpdatePassword');
     let inputRole = $('#inputUpdateRole');
 
+    inputId.val(user.id);
     inputLogin.val(user.login);
     inputName.val(user.name);
+    inputPassword.val('');
 
     let hasAdmin = user.roles
         .map(role => role.name)
@@ -101,6 +117,9 @@ function userActionEdit(user) {
     } else {
         inputRole.val("USER").change();
     }
+
+    informationContainer.css('display', 'none');
+    information.empty();
 
     dialog.find('.modal-title').text('Update ' + user.login);
     dialog.modal('show');
@@ -119,6 +138,7 @@ function userDelete(id, tableRowId) {
 function userCreate() {
     let informationContainer = $('#informationCreateUserContainer');
     let information = $('#informationCreateUser');
+
     let login = $('#inputNewLogin').val().trim();
     let name = $('#inputNewName').val().trim();
     let password = $('#inputNewPassword').val().trim();
@@ -156,8 +176,60 @@ function userCreate() {
                 information.html('<strong>Attention</strong> user added to database by id ' + user.id);
                 informationContainer.css('display', 'block');
 
-                stateCreateNewUser = true;
+                stateUpdateOrNewUser = true;
             });
+        }
+    });
+}
+
+function userUpdate() {
+    let informationContainer = $('#informationUpdateUserContainer');
+    let information = $('#informationUpdateUser');
+
+    let id = $('#inputUpdateId').val().trim();
+    let login = $('#inputUpdateLogin').val().trim();
+    let name = $('#inputUpdateName').val().trim();
+    let password = $('#inputUpdatePassword').val().trim();
+    let role = $('#inputUpdateRole').val().trim();
+
+    if (login.length === 0 || name.length === 0) {
+        information.removeClass('alert-success');
+        information.addClass('alert-danger');
+        information.html('<strong>Attention</strong> some fields are incorrect or empty.');
+        informationContainer.css('display', 'block');
+        return;
+    }
+
+    let user = {
+        id: id,
+        login: login,
+        name: name,
+        password: password,
+        roles: [
+            {
+                name: role
+            }
+        ]
+    };
+
+    userRestService.update(user).then(response => {
+        if (response.status === 404) {
+            information.removeClass('alert-success');
+            information.addClass('alert-danger');
+            information.html('<strong>Attention</strong> i can’t find the user in t.');
+            informationContainer.css('display', 'block');
+        } else if (response.status === 400) {
+            information.removeClass('alert-success');
+            information.addClass('alert-danger');
+            information.html('<strong>Attention</strong> failed to update data.');
+            informationContainer.css('display', 'block');
+        } else if (response.ok) {
+            information.removeClass('alert-danger');
+            information.addClass('alert-success');
+            information.html('<strong>Attention</strong> Data updated successfully.');
+            informationContainer.css('display', 'block');
+
+            stateUpdateOrNewUser = true;
         }
     });
 }
