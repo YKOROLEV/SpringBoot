@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.korolev.springboot.model.User;
 import ru.korolev.springboot.model.dto.UserDTO;
 import ru.korolev.springboot.service.RoleService;
-import ru.korolev.springboot.service.UserDtoService;
 import ru.korolev.springboot.service.UserService;
 
 import java.security.Principal;
@@ -18,35 +17,28 @@ public class ApiV1RestController {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final UserDtoService userDtoService;
 
-    public ApiV1RestController(UserService userService, RoleService roleService, UserDtoService userDtoService) {
+    public ApiV1RestController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-        this.userDtoService = userDtoService;
     }
 
     @GetMapping("/user/all")
     public ResponseEntity<List<UserDTO>> users() {
-        List<User> users = userService.findAll();
-        return ResponseEntity.ok(userDtoService.toDto(users));
+        List<UserDTO> userDTOList = userService.getAll();
+        return ResponseEntity.ok(userDTOList);
     }
 
     @GetMapping("/user/{id}")
     public ResponseEntity<UserDTO> user(@PathVariable Long id) {
-        Optional<User> user = userService.findById(id);
+        Optional<UserDTO> userDTO = userService.getById(id);
+        return userDTO.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
 
-        if (!user.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        UserDTO userDTO = userDtoService.toDto(user.get());
-        System.out.println(userDTO.getRolesString());
-        return ResponseEntity.ok(userDTO);
     }
 
     @PostMapping("/user/create")
-    public ResponseEntity<UserDTO> userCreate(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<User> userCreate(@RequestBody UserDTO userDTO) {
         User newUser = new User(userDTO);
 
         try {
@@ -63,12 +55,13 @@ public class ApiV1RestController {
             roleService.setRoleUser(newUser);
         }
 
-        return ResponseEntity.ok(userDtoService.toDto(newUser));
+        return ResponseEntity.ok(newUser);
     }
 
     @PostMapping("/user/update")
     public ResponseEntity<?> userUpdate(@RequestBody UserDTO userDTO) {
-        User currentUser = userDtoService.toEntity(userDTO);
+        User currentUser = userService.findById(userDTO.getId())
+                .orElse(null);
 
         if (currentUser == null) {
             return ResponseEntity.notFound().build();

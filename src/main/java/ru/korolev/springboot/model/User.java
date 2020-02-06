@@ -7,6 +7,18 @@ import java.util.Collection;
 
 @Entity
 @Table(name = "user")
+@SqlResultSetMapping(
+        name = "UserDTOMapping",
+        classes = @ConstructorResult(
+                targetClass = UserDTO.class,
+                columns = {
+                        @ColumnResult(name = "id", type = Long.class),
+                        @ColumnResult(name = "login"),
+                        @ColumnResult(name = "name"),
+                        @ColumnResult(name = "password")
+                }
+        )
+)
 public class User {
 
     @Id

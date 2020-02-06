@@ -1,4 +1,4 @@
-package ru.korolev.springboot.service;
+package ru.korolev.springboot.dao;
 
 import ru.korolev.springboot.model.User;
 import ru.korolev.springboot.model.dto.UserDTO;
@@ -6,7 +6,7 @@ import ru.korolev.springboot.model.dto.UserDTO;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserService {
+public interface UserDAO extends AbstractDTO<UserDTO> {
 
     Optional<User> findById(Long id);
 
@@ -21,12 +21,4 @@ public interface UserService {
     void delete(Long id);
 
     void delete(User user);
-
-    Optional<UserDTO> getById(Long id);
-
-    Optional<UserDTO> getByLogin(String login);
-
-    List<UserDTO> getAll();
-
-    void update(UserDTO userDTO);
 }
