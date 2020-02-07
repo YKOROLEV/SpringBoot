@@ -1,6 +1,7 @@
 package ru.korolev.springboot.controler.rest;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.korolev.springboot.model.User;
 import ru.korolev.springboot.model.dto.UserDTO;
@@ -23,12 +24,19 @@ public class ApiV1RestController {
         this.roleService = roleService;
     }
 
+    @GetMapping("/auth/check")
+    public ResponseEntity<?> authCheck() {
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user/all")
     public ResponseEntity<List<UserDTO>> users() {
         List<UserDTO> userDTOList = userService.getAll();
         return ResponseEntity.ok(userDTOList);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user/{id}")
     public ResponseEntity<UserDTO> user(@PathVariable Long id) {
         Optional<UserDTO> userDTO = userService.getById(id);
@@ -37,6 +45,7 @@ public class ApiV1RestController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/user/create")
     public ResponseEntity<User> userCreate(@RequestBody UserDTO userDTO) {
         User newUser = new User(userDTO);
@@ -58,6 +67,7 @@ public class ApiV1RestController {
         return ResponseEntity.ok(newUser);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/user/update")
     public ResponseEntity<?> userUpdate(@RequestBody UserDTO userDTO) {
         User currentUser = userService.findById(userDTO.getId())
@@ -90,6 +100,7 @@ public class ApiV1RestController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user/delete/{id}")
     public ResponseEntity<?> userDelete(@PathVariable Long id, Principal principal) {
         Optional<User> user = userService.findById(id);
