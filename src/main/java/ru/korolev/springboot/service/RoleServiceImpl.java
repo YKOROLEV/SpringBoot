@@ -1,23 +1,25 @@
 package ru.korolev.springboot.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.korolev.springboot.dao.RoleDAO;
+import ru.korolev.springboot.dao.UserDAO;
 import ru.korolev.springboot.model.Role;
 import ru.korolev.springboot.model.User;
-import ru.korolev.springboot.repository.RoleRepository;
-import ru.korolev.springboot.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 @Service
+@Transactional
 public class RoleServiceImpl implements RoleService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final UserDAO userDAO;
+    private final RoleDAO roleDAO;
 
-    public RoleServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+    public RoleServiceImpl(UserDAO userDAO, RoleDAO roleDAO) {
+        this.userDAO = userDAO;
+        this.roleDAO = roleDAO;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         user.setRoles(roleAdmin());
-        userRepository.save(user);
+        userDAO.save(user);
     }
 
     @Override
@@ -37,7 +39,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         user.setRoles(roleUser());
-        userRepository.save(user);
+        userDAO.save(user);
     }
 
 
@@ -55,10 +57,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private Role getRoleAdmin() {
-        return roleRepository.findByName("ADMIN").orElse(null);
+        return roleDAO.findByName("ADMIN").orElse(null);
     }
 
     private Role getRoleUser() {
-        return roleRepository.findByName("USER").orElse(null);
+        return roleDAO.findByName("USER").orElse(null);
     }
 }

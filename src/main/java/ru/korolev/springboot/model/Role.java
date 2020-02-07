@@ -6,6 +6,16 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "roles")
+@SqlResultSetMapping(
+        name = "RoleDTOMapping",
+        classes = @ConstructorResult(
+                targetClass = RoleDTO.class,
+                columns = {
+                        @ColumnResult(name = "id", type = Long.class),
+                        @ColumnResult(name = "name"),
+                }
+        )
+)
 public class Role {
 
     @Id
