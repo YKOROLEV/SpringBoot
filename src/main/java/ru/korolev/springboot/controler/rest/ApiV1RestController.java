@@ -1,5 +1,6 @@
 package ru.korolev.springboot.controler.rest;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +25,20 @@ public class ApiV1RestController {
         this.roleService = roleService;
     }
 
-    @GetMapping("/auth/check")
-    public ResponseEntity<?> authCheck() {
-        return ResponseEntity.ok().build();
+    @GetMapping("/authorization")
+    public ResponseEntity<UserDTO> authorization(@RequestParam(name = "login") String login,
+                                                 @RequestParam(name = "password") String password) {
+        Optional<UserDTO> userDTO = userService.getByLogin(login);
+
+        if (userDTO.isPresent()) {
+            if (!userDTO.get().getPassword().equals(password)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+
+        return userDTO.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -47,7 +59,7 @@ public class ApiV1RestController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/user/create")
-    public ResponseEntity<User> userCreate(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> userCreate(@RequestBody UserDTO userDTO) {
         User newUser = new User(userDTO);
 
         try {
@@ -64,7 +76,8 @@ public class ApiV1RestController {
             roleService.setRoleUser(newUser);
         }
 
-        return ResponseEntity.ok(newUser);
+        userDTO = new UserDTO(newUser);
+        return ResponseEntity.ok(userDTO);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
