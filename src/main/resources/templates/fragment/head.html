@@ -9,7 +9,7 @@
     <script src="bootstrap/js/bootstrap.js"></script>
 
     <script sec:authorize="isAuthenticated()" th:inline="javascript">
-        const principal = /*[[${#authentication.getPrincipal().username}]]*/ null;
+        const principal = /*[[${#authentication.getPrincipal()}]]*/ null;
     </script>
 </th:block>
 

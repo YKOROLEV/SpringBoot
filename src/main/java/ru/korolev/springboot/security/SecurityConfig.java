@@ -7,25 +7,24 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import ru.korolev.springboot.service.UserDetailsServiceImpl;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserDetailsServiceImpl userDetailsService;
+    private final AuthenticationProviderImpl authenticationProvider;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService,
+    public SecurityConfig(AuthenticationProviderImpl authenticationProvider,
                           AuthenticationSuccessHandler authenticationSuccessHandler) {
-        this.userDetailsService = userDetailsService;
+        this.authenticationProvider = authenticationProvider;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
     }
 
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
+        auth.authenticationProvider(authenticationProvider);
     }
 
     @Override
@@ -48,6 +47,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .anyRequest().authenticated();
+
+        http
+                .authenticationProvider(authenticationProvider);
 
         http
                 .formLogin()

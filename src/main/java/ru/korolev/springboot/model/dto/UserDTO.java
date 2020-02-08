@@ -1,10 +1,8 @@
 package ru.korolev.springboot.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ru.korolev.springboot.model.User;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -32,18 +30,6 @@ public class UserDTO {
         this.login = login;
         this.name = name;
         this.password = password;
-    }
-
-    public UserDTO(User user) {
-        this.id = user.getId();
-        this.login = user.getLogin();
-        this.name = user.getName();
-        this.password = user.getPassword();
-
-        this.roles = user.getRoles()
-                .stream()
-                .map(RoleDTO::new)
-                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Long getId() {
