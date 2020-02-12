@@ -10,6 +10,8 @@ public interface RestService {
 
     Optional<UserDTO> authorization(String login, String password);
 
+    Optional<UserDTO> authorization(boolean social, String login, String name);
+
     List<UserDTO> getAll();
 
     Optional<UserDTO> getById(Long id);
@@ -19,4 +21,6 @@ public interface RestService {
     HttpStatus update(UserDTO userDTO);
 
     HttpStatus delete(Long id);
+
+    void setBasicAuthentication(String login, String password);
 }

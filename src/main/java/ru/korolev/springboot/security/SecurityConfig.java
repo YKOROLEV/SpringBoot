@@ -44,12 +44,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/api/**").permitAll()
-                .antMatchers("/login").permitAll()
+                .antMatchers("/api/**").hasRole("ADMIN")
+                .antMatchers("/login/**").permitAll()
+                .antMatchers("/oauth2/**").permitAll()
                 .anyRequest().authenticated();
-
-        http
-                .authenticationProvider(authenticationProvider);
 
         http
                 .formLogin()
@@ -58,6 +56,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .usernameParameter("login")
                 .passwordParameter("password")
                 .failureForwardUrl("/login?error=true")
+                .successHandler(authenticationSuccessHandler);
+
+        http
+                .oauth2Login()
+                .loginPage("/login")
                 .successHandler(authenticationSuccessHandler);
 
         http
