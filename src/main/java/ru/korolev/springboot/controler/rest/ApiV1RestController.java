@@ -26,13 +26,22 @@ public class ApiV1RestController {
     }
 
     @GetMapping("/authorization")
-    public ResponseEntity<UserDTO> authorization(@RequestParam(name = "login") String login,
-                                                 @RequestParam(name = "password") String password) {
+    public ResponseEntity<UserDTO> authorization(@RequestParam(name = "social") Boolean social,
+                                                 @RequestParam(name = "login") String login,
+                                                 @RequestParam(name = "password") String password,
+                                                 @RequestParam(name = "name") String name) {
         Optional<UserDTO> userDTO = userService.getByLogin(login);
 
         if (userDTO.isPresent()) {
-            if (!userDTO.get().getPassword().equals(password)) {
+            if (!social && !userDTO.get().getPassword().equals(password)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        } else {
+            if (social) {
+                User user = new User(login, name, password);
+                userService.save(user);
+                roleService.setRoleUser(user);
+                userDTO = Optional.of(new UserDTO(user));
             }
         }
 
@@ -120,10 +129,6 @@ public class ApiV1RestController {
 
         if (!user.isPresent()) {
             return ResponseEntity.notFound().build();
-        }
-
-        if (user.get().getLogin().equals(principal.getName())) {
-            return ResponseEntity.badRequest().build();
         }
 
         try {
