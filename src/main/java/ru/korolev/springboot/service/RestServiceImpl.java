@@ -3,7 +3,6 @@ package ru.korolev.springboot.service;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -17,12 +16,10 @@ import java.util.Optional;
 @Service
 public class RestServiceImpl implements RestService {
 
-    private final OAuth2AuthorizedClientService authorizedClientService;
     private final RestTemplateBuilder restTemplateBuilder;
     private RestTemplate restTemplate;
 
-    public RestServiceImpl(OAuth2AuthorizedClientService authorizedClientService, RestTemplateBuilder restTemplateBuilder) {
-        this.authorizedClientService = authorizedClientService;
+    public RestServiceImpl(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplateBuilder = restTemplateBuilder;
     }
 
